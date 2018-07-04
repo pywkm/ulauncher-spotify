@@ -1,0 +1,31 @@
+{
+  "manifest_version": "2",
+  "api_version": "1",
+  "name": "Spotify player",
+  "description": "Control your spotify desktop app from Ulauncher",
+  "developer_name": "Wiktor Matuszewski",
+  "icon": "images/icon.png",
+  "options": {
+    "query_debounce": 0.1
+  },
+  "preferences": [
+    {
+      "id": "demo_kw",
+      "type": "keyword",
+      "name": "Spotify player",
+      "description": "Control Spotify from Ulauncher",
+      "default_value": "sp"
+    },
+    {
+      "id": "keep_open",
+      "type": "select",
+      "name": "Keep app open",
+      "description": "Keep Ulauncher open after choosing an option (close with ESC)",
+      "default_value": "true",
+      "options": [
+        {"value": "false", "text": "No"},
+        {"value": "true", "text": "Yes"}
+      ]
+    }
+  ]
+}
