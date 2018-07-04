@@ -1,2 +1,4 @@
 # ulauncher-spotify
-Ulauncher extension for controlling Spotify
+[Ulauncher](https://ulauncher.io/) extension for controlling Spotify
+
+![screenshot](images/screenshot.png)

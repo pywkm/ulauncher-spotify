@@ -2,7 +2,7 @@
   "manifest_version": "2",
   "api_version": "1",
   "name": "Spotify player",
-  "description": "Control your spotify desktop app from Ulauncher",
+  "description": "Control your Spotify desktop app from Ulauncher",
   "developer_name": "Wiktor Matuszewski",
   "icon": "images/icon.png",
   "options": {
