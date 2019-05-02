@@ -30,9 +30,9 @@
     {
       "id": "custom_format",
       "type": "text",
-      "name": "Current track description template",
-      "description": "Available tags can be found on the extension site: https://ext.ulauncher.io/-/github-pywkm-ulauncher-spotify",
-      "default_value": "{artist} - {title}\nAlbum: {album}    ({playback_status})"
+      "name": "Current track formatting template",
+      "description": "More info on the extension GitHub site: https://github.com/pywkm/ulauncher-spotify",
+      "default_value": "{artist} - {title}\nAlbum: {album}     ({playback_status})"
     }
   ]
 }
