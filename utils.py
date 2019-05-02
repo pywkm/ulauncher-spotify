@@ -1,3 +1,4 @@
+import collections
 import time
 import dbus
 
@@ -5,6 +6,9 @@ from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAct
 from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 
 import constants as cs
+
+
+Status = collections.namedtuple('Status', 'state artist title album')
 
 
 class Spotify(object):
@@ -18,12 +22,12 @@ class Spotify(object):
 
     @property
     def status(self):
-        return {
-            'state': str(self._properties.Get(cs.PLAYER_INTERFACE, cs.Properties.STATUS)),
-            'artist': ', '.join(self._metadata[cs.MetadataKeys.ARTIST]).encode('utf8'),
-            'title': self._metadata[cs.MetadataKeys.TITLE].encode('utf8'),
-            'album': self._metadata[cs.MetadataKeys.ALBUM].encode('utf8'),
-        }
+        return Status(
+            state=str(self._properties.Get(cs.PLAYER_INTERFACE, cs.Properties.STATUS)),
+            artist=', '.join(self._metadata[cs.MetadataKeys.ARTIST]).encode('utf8'),
+            title=self._metadata[cs.MetadataKeys.TITLE].encode('utf8'),
+            album=self._metadata[cs.MetadataKeys.ALBUM].encode('utf8'),
+        )
 
     @property
     def keep_open(self):
@@ -33,9 +37,9 @@ class Spotify(object):
     def menu_items(self):
         return [
             ExtensionResultItem(
-                icon=cs.IconPaths.PLAY if self.status['state'] == cs.States.PAUSED else cs.IconPaths.PAUSE,
-                name='{} - {}'.format(self.status['artist'], self.status['title']),
-                description='Album: {}     ({})'.format(self.status['album'], self.status['state']),
+                icon=cs.IconPaths.PLAY if self.status.state == cs.States.PAUSED else cs.IconPaths.PAUSE,
+                name='{} - {}'.format(self.status.artist, self.status.title),
+                description='Album: {}     ({})'.format(self.status.album, self.status.state),
                 on_enter=ExtensionCustomAction(cs.Actions.PLAY_PAUSE, keep_app_open=self.keep_open),
             ),
             ExtensionResultItem(
