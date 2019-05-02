@@ -10,7 +10,7 @@ from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 
 
 player_interface = 'org.mpris.MediaPlayer2.Player'
-properites_interface = 'org.freedesktop.DBus.Properties'
+properties_interface = 'org.freedesktop.DBus.Properties'
 spotify_app_path = '/usr/share/spotify/spotify.desktop'
 spotify_bus_name = 'org.mpris.MediaPlayer2.spotify'
 player_object_path = '/org/mpris/MediaPlayer2'
@@ -25,7 +25,7 @@ def get_spotify_bus():
 
 
 def get_menu_items(spotify_bus, keep_open=True):
-    spotify_properties = dbus.Interface(spotify_bus, properites_interface)
+    spotify_properties = dbus.Interface(spotify_bus, properties_interface)
     meta_data = spotify_properties.Get(player_interface, 'Metadata')
     status = spotify_properties.Get(player_interface, 'PlaybackStatus')
     artist_name = ', '.join(meta_data['xesam:artist']).encode('utf8')
@@ -90,6 +90,7 @@ class KeywordQueryEventListener(EventListener):
             )
         keep_open = boolify(extension.preferences.get('keep_open'))
         return RenderResultListAction(get_menu_items(spotify_bus, keep_open))
+
 
 if __name__ == '__main__':
     ControlSpotifyExtension().run()

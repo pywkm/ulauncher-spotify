@@ -10,7 +10,7 @@
   },
   "preferences": [
     {
-      "id": "demo_kw",
+      "id": "spotify_player",
       "type": "keyword",
       "name": "Spotify player",
       "description": "Control Spotify from Ulauncher",
