@@ -38,7 +38,7 @@ class KeywordQueryEventListener(SpotifyEventListener):
     def on_event(self, event, extension):
         super(KeywordQueryEventListener, self).on_event(event, extension)
         if not spotify.connected:
-            return results.no_spotify_launched()
+            return results.spotify_not_launched()
         return results.menu_items(spotify.status)
 
 

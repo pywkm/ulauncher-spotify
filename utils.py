@@ -69,16 +69,8 @@ class ResultsRenderer(object):
     def keep_open(self):
         return str(self._preferences.get('keep_open')).lower() == 'true'
 
-    @property
-    def name_line(self):
-        return self._name_line
-
-    @property
-    def description_line(self):
-        return self._description_line
-
     @staticmethod
-    def no_spotify_launched():
+    def spotify_not_launched():
         return RenderResultListAction([
             ExtensionResultItem(
                 icon=cs.IconPaths.ICON,
@@ -88,23 +80,11 @@ class ResultsRenderer(object):
         ])
 
     def menu_items(self, spotify_status):
-        try:
-            name = self.name_line.format(**spotify_status._asdict())
-        except (KeyError, ValueError) as err:
-            name = '{}: "{}"'.format(err, self.name_line)
-        except IndexError:
-            name = 'Too many {{}}: "{}"'.format(self.name_line)
-        try:
-            description = self.description_line.format(**spotify_status._asdict())
-        except (KeyError, ValueError) as err:
-            description = '{}: "{}"'.format(err, self.description_line)
-        except IndexError:
-            description = 'Too many {{}}: "{}"'.format(self.description_line)
         return RenderResultListAction([
             ExtensionResultItem(
                 icon=cs.IconPaths.PLAY if spotify_status.playback_status == cs.States.PAUSED else cs.IconPaths.PAUSE,
-                name=name,
-                description=description,
+                name=self._format(self._name_line, spotify_status),
+                description=self._format(self._description_line, spotify_status),
                 on_enter=ExtensionCustomAction(cs.Actions.PLAY_PAUSE, keep_app_open=self.keep_open),
             ),
             ExtensionResultItem(
@@ -128,3 +108,14 @@ class ResultsRenderer(object):
             name_line = formatting
             description_line = ''
         self._name_line, self._description_line = name_line, description_line
+
+    @staticmethod
+    def _format(template, spotify_status):
+        try:
+            return template.format(**spotify_status._asdict())
+        except ValueError as err:
+            return '{}: "{}"'.format(err, template)
+        except KeyError as err:
+            return 'Unknown tag "{}" in: "{}"'.format(err, template)
+        except IndexError:
+            return 'Too many {{}}: "{}"'.format(template)
