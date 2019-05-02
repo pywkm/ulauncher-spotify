@@ -1,6 +1,6 @@
 PLAYER_INTERFACE = 'org.mpris.MediaPlayer2.Player'
 PROPERTIES_INTERFACE = 'org.freedesktop.DBus.Properties'
-APP_PATH = '/usr/share/spotify/spotify.desktop'
+SPOTIFY_PATH = '/usr/share/spotify/spotify.desktop'
 BUS_NAME = 'org.mpris.MediaPlayer2.spotify'
 PLAYER_PATH = '/org/mpris/MediaPlayer2'
 

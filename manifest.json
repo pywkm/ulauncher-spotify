@@ -26,6 +26,13 @@
         {"value": "false", "text": "No"},
         {"value": "true", "text": "Yes"}
       ]
+    },
+    {
+      "id": "custom_format",
+      "type": "text",
+      "name": "Current track description template",
+      "description": "Available tags can be found on the extension site: https://ext.ulauncher.io/-/github-pywkm-ulauncher-spotify",
+      "default_value": "{artist} - {title}\nAlbum: {album}    ({playback_status})"
     }
   ]
 }
