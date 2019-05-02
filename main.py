@@ -5,6 +5,7 @@ from ulauncher.api.shared.action.LaunchAppAction import LaunchAppAction
 from ulauncher.api.shared.event import KeywordQueryEvent, ItemEnterEvent
 from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 
+import constants
 import utils
 
 
@@ -43,9 +44,9 @@ class KeywordQueryEventListener(SpotifyEventListener):
             return RenderResultListAction(
                 [
                     ExtensionResultItem(
-                        icon='images/icon.png',
+                        icon=constants.IconPaths.ICON,
                         name='Run Spotify desktop app first',
-                        on_enter=LaunchAppAction(spotify.APP_PATH)
+                        on_enter=LaunchAppAction(constants.APP_PATH)
                     ),
                 ]
             )

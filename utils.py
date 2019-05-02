@@ -4,18 +4,10 @@ import dbus
 from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
 from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 
-
-def boolify(string):
-    return string.lower() == 'true'
+import constants as cs
 
 
 class Spotify(object):
-
-    PLAYER_INTERFACE = 'org.mpris.MediaPlayer2.Player'
-    PROPERTIES_INTERFACE = 'org.freedesktop.DBus.Properties'
-    APP_PATH = '/usr/share/spotify/spotify.desktop'
-    BUS_NAME = 'org.mpris.MediaPlayer2.spotify'
-    PLAYER_PATH = '/org/mpris/MediaPlayer2'
 
     connected = False
     _preferences = None
@@ -25,34 +17,34 @@ class Spotify(object):
     @property
     def status(self):
         return {
-            'state': str(self._properties.Get(self.PLAYER_INTERFACE, 'PlaybackStatus')),
-            'artist': ', '.join(self._metadata['xesam:artist']).encode('utf8'),
-            'track': self._metadata['xesam:title'].encode('utf8'),
-            'album': self._metadata['xesam:album'].encode('utf8'),
+            'state': str(self._properties.Get(cs.PLAYER_INTERFACE, cs.Properties.STATUS)),
+            'artist': ', '.join(self._metadata[cs.MetadataKeys.ARTIST]).encode('utf8'),
+            'title': self._metadata[cs.MetadataKeys.TITLE].encode('utf8'),
+            'album': self._metadata[cs.MetadataKeys.ALBUM].encode('utf8'),
         }
 
     @property
     def keep_open(self):
-        return boolify(self._preferences.get('keep_open'))
+        return str(self._preferences.get('keep_open')).lower() == 'true'
 
     @property
     def menu_items(self):
         return [
             ExtensionResultItem(
-                icon='images/play.png' if self.status['state'] == 'Paused' else 'images/pause.png',
-                name='{} - {}'.format(self.status['artist'], self.status['track']),
+                icon=cs.IconPaths.PLAY if self.status['state'] == cs.States.PAUSED else cs.IconPaths.PAUSE,
+                name='{} - {}'.format(self.status['artist'], self.status['title']),
                 description='Album: {}     ({})'.format(self.status['album'], self.status['state']),
-                on_enter=ExtensionCustomAction('PlayPause', keep_app_open=self.keep_open),
+                on_enter=ExtensionCustomAction(cs.Actions.PLAY_PAUSE, keep_app_open=self.keep_open),
             ),
             ExtensionResultItem(
-                icon='images/next.png',
+                icon=cs.IconPaths.NEXT,
                 name='Next track',
-                on_enter=ExtensionCustomAction('Next', keep_app_open=self.keep_open),
+                on_enter=ExtensionCustomAction(cs.Actions.NEXT, keep_app_open=self.keep_open),
             ),
             ExtensionResultItem(
-                icon='images/prev.png',
+                icon=cs.IconPaths.PREVIOUS,
                 name='Previous track',
-                on_enter=ExtensionCustomAction('Previous', keep_app_open=self.keep_open),
+                on_enter=ExtensionCustomAction(cs.Actions.PREVIOUS, keep_app_open=self.keep_open),
             ),
         ]
 
@@ -67,16 +59,16 @@ class Spotify(object):
 
     def connect(self):
         try:
-            self._bus = dbus.SessionBus().get_object(self.BUS_NAME, self.PLAYER_PATH)
+            self._bus = dbus.SessionBus().get_object(cs.BUS_NAME, cs.PLAYER_PATH)
         except dbus.exceptions.DBusException:
             return
         self.connected = True
-        self._interface = dbus.Interface(self._bus, dbus_interface=self.PLAYER_INTERFACE)
+        self._interface = dbus.Interface(self._bus, dbus_interface=cs.PLAYER_INTERFACE)
 
     @property
     def _properties(self):
-        return dbus.Interface(self._bus, self.PROPERTIES_INTERFACE)
+        return dbus.Interface(self._bus, cs.PROPERTIES_INTERFACE)
 
     @property
     def _metadata(self):
-        return self._properties.Get(self.PLAYER_INTERFACE, 'Metadata')
+        return self._properties.Get(cs.PLAYER_INTERFACE, cs.Properties.METADATA)
