@@ -26,6 +26,13 @@
         {"value": "false", "text": "No"},
         {"value": "true", "text": "Yes"}
       ]
+    },
+    {
+      "id": "custom_format",
+      "type": "text",
+      "name": "Current track formatting template",
+      "description": "More info on the extension GitHub site: https://github.com/pywkm/ulauncher-spotify",
+      "default_value": "{artist} - {title}\nAlbum: {album}     ({playback_status})"
     }
   ]
 }

@@ -1,15 +1,12 @@
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
-from ulauncher.api.shared.action.RenderResultListAction import RenderResultListAction
-from ulauncher.api.shared.action.LaunchAppAction import LaunchAppAction
 from ulauncher.api.shared.event import KeywordQueryEvent, ItemEnterEvent
-from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 
-import constants
 import utils
 
 
 spotify = utils.Spotify()
+results = utils.ResultsRenderer()
 
 
 class SpotifyEventListener(EventListener):
@@ -17,7 +14,7 @@ class SpotifyEventListener(EventListener):
     def on_event(self, event, extension):
         if not spotify.connected:
             spotify.connect()
-        spotify.update_preferences(extension.preferences)
+        results.update_preferences(extension.preferences)
 
 
 class ControlSpotifyExtension(Extension):
@@ -33,7 +30,7 @@ class ItemEnterEventListener(SpotifyEventListener):
     def on_event(self, event, extension):
         super(ItemEnterEventListener, self).on_event(event, extension)
         spotify.execute_command(event.get_data())
-        return RenderResultListAction(spotify.menu_items)
+        return results.menu_items(spotify.status)
 
 
 class KeywordQueryEventListener(SpotifyEventListener):
@@ -41,16 +38,8 @@ class KeywordQueryEventListener(SpotifyEventListener):
     def on_event(self, event, extension):
         super(KeywordQueryEventListener, self).on_event(event, extension)
         if not spotify.connected:
-            return RenderResultListAction(
-                [
-                    ExtensionResultItem(
-                        icon=constants.IconPaths.ICON,
-                        name='Run Spotify desktop app first',
-                        on_enter=LaunchAppAction(constants.APP_PATH)
-                    ),
-                ]
-            )
-        return RenderResultListAction(spotify.menu_items)
+            return results.spotify_not_launched()
+        return results.menu_items(spotify.status)
 
 
 if __name__ == '__main__':

@@ -3,56 +3,32 @@ import time
 import dbus
 
 from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
+from ulauncher.api.shared.action.LaunchAppAction import LaunchAppAction
+from ulauncher.api.shared.action.RenderResultListAction import RenderResultListAction
 from ulauncher.api.shared.item.ExtensionResultItem import ExtensionResultItem
 
 import constants as cs
 
 
-Status = collections.namedtuple('Status', 'state artist title album')
+Status = collections.namedtuple('Status', 'playback_status artist title album')
 
 
 class Spotify(object):
 
     connected = False
-    _preferences = None
     _bus = None
     _interface = None
     _interval = 0.02
-    _max_wait = 0.5
+    _max_wait = 1
 
     @property
     def status(self):
         return Status(
-            state=str(self._properties.Get(cs.PLAYER_INTERFACE, cs.Properties.STATUS)),
+            playback_status=str(self._properties.Get(cs.PLAYER_INTERFACE, cs.Properties.STATUS)),
             artist=', '.join(self._metadata[cs.MetadataKeys.ARTIST]).encode('utf8'),
             title=self._metadata[cs.MetadataKeys.TITLE].encode('utf8'),
             album=self._metadata[cs.MetadataKeys.ALBUM].encode('utf8'),
         )
-
-    @property
-    def keep_open(self):
-        return str(self._preferences.get('keep_open')).lower() == 'true'
-
-    @property
-    def menu_items(self):
-        return [
-            ExtensionResultItem(
-                icon=cs.IconPaths.PLAY if self.status.state == cs.States.PAUSED else cs.IconPaths.PAUSE,
-                name='{} - {}'.format(self.status.artist, self.status.title),
-                description='Album: {}     ({})'.format(self.status.album, self.status.state),
-                on_enter=ExtensionCustomAction(cs.Actions.PLAY_PAUSE, keep_app_open=self.keep_open),
-            ),
-            ExtensionResultItem(
-                icon=cs.IconPaths.NEXT,
-                name='Next track',
-                on_enter=ExtensionCustomAction(cs.Actions.NEXT, keep_app_open=self.keep_open),
-            ),
-            ExtensionResultItem(
-                icon=cs.IconPaths.PREVIOUS,
-                name='Previous track',
-                on_enter=ExtensionCustomAction(cs.Actions.PREVIOUS, keep_app_open=self.keep_open),
-            ),
-        ]
 
     def execute_command(self, command):
         old_status = self.status
@@ -62,9 +38,6 @@ class Spotify(object):
         while self.status == old_status and waited <= self._max_wait:
             time.sleep(self._interval)
             waited += self._interval
-
-    def update_preferences(self, preferences):
-        self._preferences = preferences
 
     def connect(self):
         try:
@@ -81,3 +54,68 @@ class Spotify(object):
     @property
     def _metadata(self):
         return self._properties.Get(cs.PLAYER_INTERFACE, cs.Properties.METADATA)
+
+
+class ResultsRenderer(object):
+    _preferences = None
+    _name_line = None
+    _description_line = None
+
+    def update_preferences(self, preferences):
+        self._preferences = preferences
+        self._set_formatting()
+
+    @property
+    def keep_open(self):
+        return str(self._preferences.get('keep_open')).lower() == 'true'
+
+    @staticmethod
+    def spotify_not_launched():
+        return RenderResultListAction([
+            ExtensionResultItem(
+                icon=cs.IconPaths.ICON,
+                name='Run Spotify desktop app first',
+                on_enter=LaunchAppAction(cs.SPOTIFY_PATH)
+            ),
+        ])
+
+    def menu_items(self, spotify_status):
+        return RenderResultListAction([
+            ExtensionResultItem(
+                icon=cs.IconPaths.PLAY if spotify_status.playback_status == cs.States.PAUSED else cs.IconPaths.PAUSE,
+                name=self._format(self._name_line, spotify_status),
+                description=self._format(self._description_line, spotify_status),
+                on_enter=ExtensionCustomAction(cs.Actions.PLAY_PAUSE, keep_app_open=self.keep_open),
+            ),
+            ExtensionResultItem(
+                icon=cs.IconPaths.NEXT,
+                name='Next track',
+                on_enter=ExtensionCustomAction(cs.Actions.NEXT, keep_app_open=self.keep_open),
+            ),
+            ExtensionResultItem(
+                icon=cs.IconPaths.PREVIOUS,
+                name='Previous track',
+                on_enter=ExtensionCustomAction(cs.Actions.PREVIOUS, keep_app_open=self.keep_open),
+            ),
+        ])
+
+    def _set_formatting(self):
+        formatting = self._preferences.get('custom_format')
+        try:
+            name_line, description_line = formatting.split('\n', 1)
+            description_line = description_line.split('\n')[0]
+        except ValueError:
+            name_line = formatting
+            description_line = ''
+        self._name_line, self._description_line = name_line, description_line
+
+    @staticmethod
+    def _format(template, spotify_status):
+        try:
+            return template.format(**spotify_status._asdict())
+        except ValueError as err:
+            return '{}: "{}"'.format(err, template)
+        except KeyError as err:
+            return 'Unknown tag "{}" in: "{}"'.format(err, template)
+        except IndexError:
+            return 'Too many {{}}: "{}"'.format(template)
