@@ -13,6 +13,8 @@ class Spotify(object):
     _preferences = None
     _bus = None
     _interface = None
+    _interval = 0.02
+    _max_wait = 0.5
 
     @property
     def status(self):
@@ -51,8 +53,11 @@ class Spotify(object):
     def execute_command(self, command):
         old_status = self.status
         getattr(self._interface, command)()
-        while self.status == old_status:
-            time.sleep(0.02)
+        waited = 0
+        # Status might not change if action is 'Previous' and same track is played again
+        while self.status == old_status and waited <= self._max_wait:
+            time.sleep(self._interval)
+            waited += self._interval
 
     def update_preferences(self, preferences):
         self._preferences = preferences
