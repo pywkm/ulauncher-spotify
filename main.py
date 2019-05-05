@@ -1,20 +1,12 @@
 from ulauncher.api.client.Extension import Extension
 from ulauncher.api.client.EventListener import EventListener
-from ulauncher.api.shared.event import KeywordQueryEvent, ItemEnterEvent
+from ulauncher.api.shared.event import ItemEnterEvent, KeywordQueryEvent
 
 import utils
 
 
 spotify = utils.Spotify()
 results = utils.ResultsRenderer()
-
-
-class SpotifyEventListener(EventListener):
-
-    def on_event(self, event, extension):
-        if not spotify.connected:
-            spotify.connect()
-        results.update_preferences(extension.preferences)
 
 
 class ControlSpotifyExtension(Extension):
@@ -25,21 +17,18 @@ class ControlSpotifyExtension(Extension):
         self.subscribe(ItemEnterEvent, ItemEnterEventListener())
 
 
-class ItemEnterEventListener(SpotifyEventListener):
+class ItemEnterEventListener(EventListener):
 
-    def on_event(self, event, extension):
-        super(ItemEnterEventListener, self).on_event(event, extension)
+    def on_event(self, event, _extension):
         spotify.execute_command(event.get_data())
-        return results.menu_items(spotify.status)
+        return results.menu_items(spotify)
 
 
-class KeywordQueryEventListener(SpotifyEventListener):
+class KeywordQueryEventListener(EventListener):
 
-    def on_event(self, event, extension):
-        super(KeywordQueryEventListener, self).on_event(event, extension)
-        if not spotify.connected:
-            return results.spotify_not_launched()
-        return results.menu_items(spotify.status)
+    def on_event(self, _event, extension):
+        results.update_preferences(extension.preferences)
+        return results.menu_items(spotify)
 
 
 if __name__ == '__main__':
