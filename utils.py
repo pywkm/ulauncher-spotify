@@ -16,8 +16,6 @@ Status = collections.namedtuple('Status', 'playback_status artist title album')
 class Spotify(object):
 
     connected = False
-    _bus = None
-    _interface = None
     _interval = 0.02
     _max_wait = 1
 
@@ -39,13 +37,13 @@ class Spotify(object):
             time.sleep(self._interval)
             waited += self._interval
 
-    def connect(self):
-        try:
-            self._bus = dbus.SessionBus().get_object(cs.BUS_NAME, cs.PLAYER_PATH)
-        except dbus.exceptions.DBusException:
-            return
-        self.connected = True
-        self._interface = dbus.Interface(self._bus, dbus_interface=cs.PLAYER_INTERFACE)
+    @property
+    def _bus(self):
+        return dbus.SessionBus().get_object(cs.BUS_NAME, cs.PLAYER_PATH)
+
+    @property
+    def _interface(self):
+        return dbus.Interface(self._bus, dbus_interface=cs.PLAYER_INTERFACE)
 
     @property
     def _properties(self):
@@ -69,8 +67,14 @@ class ResultsRenderer(object):
     def keep_open(self):
         return str(self._preferences.get('keep_open')).lower() == 'true'
 
+    def menu_items(self, spotify):
+        try:
+            return self._control_panel(spotify.status)
+        except dbus.exceptions.DBusException:
+            return self._spotify_not_launched()
+
     @staticmethod
-    def spotify_not_launched():
+    def _spotify_not_launched():
         return RenderResultListAction([
             ExtensionResultItem(
                 icon=cs.IconPaths.ICON,
@@ -79,7 +83,7 @@ class ResultsRenderer(object):
             ),
         ])
 
-    def menu_items(self, spotify_status):
+    def _control_panel(self, spotify_status):
         return RenderResultListAction([
             ExtensionResultItem(
                 icon=cs.IconPaths.PLAY if spotify_status.playback_status == cs.States.PAUSED else cs.IconPaths.PAUSE,

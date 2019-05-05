@@ -12,8 +12,6 @@ results = utils.ResultsRenderer()
 class SpotifyEventListener(EventListener):
 
     def on_event(self, event, extension):
-        if not spotify.connected:
-            spotify.connect()
         results.update_preferences(extension.preferences)
 
 
@@ -30,16 +28,14 @@ class ItemEnterEventListener(SpotifyEventListener):
     def on_event(self, event, extension):
         super(ItemEnterEventListener, self).on_event(event, extension)
         spotify.execute_command(event.get_data())
-        return results.menu_items(spotify.status)
+        return results.menu_items(spotify)
 
 
 class KeywordQueryEventListener(SpotifyEventListener):
 
     def on_event(self, event, extension):
         super(KeywordQueryEventListener, self).on_event(event, extension)
-        if not spotify.connected:
-            return results.spotify_not_launched()
-        return results.menu_items(spotify.status)
+        return results.menu_items(spotify)
 
 
 if __name__ == '__main__':
