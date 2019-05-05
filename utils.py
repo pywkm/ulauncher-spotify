@@ -1,6 +1,6 @@
+import dbus
 import collections
 import time
-import dbus
 
 from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
 from ulauncher.api.shared.action.LaunchAppAction import LaunchAppAction
