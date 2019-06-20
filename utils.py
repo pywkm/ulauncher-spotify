@@ -13,7 +13,7 @@ import constants as cs
 Status = collections.namedtuple('Status', 'playback_status artist title album')
 
 
-class Spotify(object):
+class Spotify:
 
     connected = False
     _interval = 0.02
@@ -22,10 +22,10 @@ class Spotify(object):
     @property
     def status(self):
         return Status(
-            playback_status=str(self._properties.Get(cs.PLAYER_INTERFACE, cs.Properties.STATUS)),
-            artist=', '.join(self._metadata[cs.MetadataKeys.ARTIST]).encode('utf8'),
-            title=self._metadata[cs.MetadataKeys.TITLE].encode('utf8'),
-            album=self._metadata[cs.MetadataKeys.ALBUM].encode('utf8'),
+            playback_status=self._properties.Get(cs.PLAYER_INTERFACE, cs.Properties.STATUS),
+            artist=', '.join(self._metadata[cs.MetadataKeys.ARTIST]),
+            title=self._metadata[cs.MetadataKeys.TITLE],
+            album=self._metadata[cs.MetadataKeys.ALBUM],
         )
 
     def execute_command(self, command):
@@ -54,7 +54,7 @@ class Spotify(object):
         return self._properties.Get(cs.PLAYER_INTERFACE, cs.Properties.METADATA)
 
 
-class ResultsRenderer(object):
+class ResultsRenderer:
     _preferences = None
     _name_line = None
     _description_line = None
