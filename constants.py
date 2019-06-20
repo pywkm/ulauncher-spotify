@@ -5,29 +5,29 @@ BUS_NAME = 'org.mpris.MediaPlayer2.spotify'
 PLAYER_PATH = '/org/mpris/MediaPlayer2'
 
 
-class Actions(object):
+class Actions:
     PLAY_PAUSE = 'PlayPause'
     NEXT = 'Next'
     PREVIOUS = 'Previous'
 
 
-class States(object):
+class States:
     PAUSED = 'Paused'
     PLAYING = 'Playing'
 
 
-class Properties(object):
+class Properties:
     STATUS = 'PlaybackStatus'
     METADATA = 'Metadata'
 
 
-class MetadataKeys(object):
+class MetadataKeys:
     ARTIST = 'xesam:artist'
     TITLE = 'xesam:title'
     ALBUM = 'xesam:album'
 
 
-class IconPaths(object):
+class IconPaths:
     ICON = 'images/icon.png'
     PLAY = 'images/play.png'
     PAUSE = 'images/pause.png'
