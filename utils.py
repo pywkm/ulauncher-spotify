@@ -105,9 +105,10 @@ class ResultsRenderer(object):
 
     def _set_formatting(self):
         formatting = self._preferences.get('custom_format')
+        newline = '\n' if '\n' in formatting else cs.NEWLINE_TAG  # backward compatibility
         try:
-            name_line, description_line = formatting.split(cs.NEWLINE_TAG, 1)
-            description_line = description_line.split(cs.NEWLINE_TAG)[0]
+            name_line, description_line = formatting.split(newline, 1)
+            description_line = description_line.split(newline)[0]
         except ValueError:
             name_line = formatting
             description_line = ''
