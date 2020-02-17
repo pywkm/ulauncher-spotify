@@ -3,6 +3,7 @@ PROPERTIES_INTERFACE = 'org.freedesktop.DBus.Properties'
 SPOTIFY_PATH = '/usr/share/spotify/spotify.desktop'
 BUS_NAME = 'org.mpris.MediaPlayer2.spotify'
 PLAYER_PATH = '/org/mpris/MediaPlayer2'
+NEWLINE_TAG = '{newline}'
 
 
 class Actions(object):

@@ -106,8 +106,8 @@ class ResultsRenderer(object):
     def _set_formatting(self):
         formatting = self._preferences.get('custom_format')
         try:
-            name_line, description_line = formatting.split('\n', 1)
-            description_line = description_line.split('\n')[0]
+            name_line, description_line = formatting.split(cs.NEWLINE_TAG, 1)
+            description_line = description_line.split(cs.NEWLINE_TAG)[0]
         except ValueError:
             name_line = formatting
             description_line = ''
